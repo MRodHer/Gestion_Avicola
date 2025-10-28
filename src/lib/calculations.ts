@@ -167,3 +167,67 @@ export function calcularCostoTransformacion(
 
   return costoPollitos + costoAlimento + costoIndirectoProrrateado;
 }
+
+// MVP Implementation: Differentiated Egg Production Tracking by Egg Color
+
+export interface EggProductionRecord {
+  date: string;
+  lotId: string;
+  eggColor: 'white' | 'brown' | 'cream' | 'other';
+  quantity: number;
+}
+
+export interface EggProductionSummary {
+  lotId: string;
+  date: string;
+  whiteEggs: number;
+  brownEggs: number;
+  creamEggs: number;
+  otherEggs: number;
+  totalEggs: number;
+}
+
+// Function to aggregate egg production by color for a given lot and date
+export function aggregateEggProduction(records: EggProductionRecord[]): EggProductionSummary | null {
+  if (records.length === 0) return null;
+
+  const lotId = records[0].lotId;
+  const date = records[0].date;
+
+  let whiteEggs = 0;
+  let brownEggs = 0;
+  let creamEggs = 0;
+  let otherEggs = 0;
+
+  for (const record of records) {
+    if (record.lotId !== lotId || record.date !== date) {
+      // Inconsistent data, skip or handle error as needed
+      continue;
+    }
+    switch (record.eggColor) {
+      case 'white':
+        whiteEggs += record.quantity;
+        break;
+      case 'brown':
+        brownEggs += record.quantity;
+        break;
+      case 'cream':
+        creamEggs += record.quantity;
+        break;
+      default:
+        otherEggs += record.quantity;
+    }
+  }
+
+  const totalEggs = whiteEggs + brownEggs + creamEggs + otherEggs;
+
+  return {
+    lotId,
+    date,
+    whiteEggs,
+    brownEggs,
+    creamEggs,
+    otherEggs,
+    totalEggs,
+  };
+}
